@@ -3,18 +3,20 @@ import { Text, SafeAreaView, View, ActivityIndicator, Button, StyleSheet, Toucha
 
 const CreateBet = ({ navigation, route }) => {
     
-    const id = route.params.id;
+    const offer_id = route.params.id;
+    const [description, setDescription] = useState('');
     const [data,setData]= useState('');
+    const [ammount, setAmmount]= useState('');
     const [isLoading, setIsLoading] = useState(true);
 
     const handleCreateBet = async () => {
         const formBody = {
-            lottery_id: id,
-            lottery_number: '0408',
+            offer_id: offer_id,
+            description: description,
             user_id: '61d70b23718b15c7703e6fc0'
         };
         try{
-            const response = await fetch(`http://10.0.2.2:3003/api/user/make_bid`, {
+            const response = await fetch(`http://10.0.2.2:3003/api/proposal/make`, {
                 method: 'POST',
                 body: JSON.stringify(formBody),
                 mode: 'cors',
@@ -41,7 +43,7 @@ const CreateBet = ({ navigation, route }) => {
     const loadData = async () => {
         
         try{
-            const response = await fetch(`http://10.0.2.2:3003/api/user/get_lotery/${id}`, {
+            const response = await fetch(`http://10.0.2.2:3003/api/offer/${id}`, {
                 headers: {
                     //Header Defination
                     'Authorization':
@@ -75,14 +77,41 @@ const CreateBet = ({ navigation, route }) => {
                             <ActivityIndicator size="small" color="#0000ff" />
                         </View> :
                         <View>
-                            <Text>{data.total_amount}</Text>
-                            <Text>{data.bid_amount}</Text>
-                            <Text>{data.plays_on}</Text>
+                            <View style={styles.SectionStyle}>
+                                <TextInput
+                                    style={styles.inputStyle}
+                                    onChangeText={(Description) => setDescription(Description)}
+                                    underlineColorAndroid="#f000"
+                                    placeholder="Enter escription"
+                                    placeholderTextColor="#8b9cb5"
+                                    autoCapitalize="sentences"
+                                    returnKeyType="next"
+                                    onSubmitEditing={() =>
+                                    emailInputRef.current && emailInputRef.current.focus()
+                                    }
+                                    blurOnSubmit={false}
+                                />
+                            </View>
+                            <View style={styles.SectionStyle}>
+                                <TextInput
+                                    style={styles.inputStyle}
+                                    onChangeText={(Ammount) => setAmmount(Ammount)}
+                                    underlineColorAndroid="#f000"
+                                    placeholder="Enter escription"
+                                    placeholderTextColor="#8b9cb5"
+                                    autoCapitalize="sentences"
+                                    returnKeyType="next"
+                                    onSubmitEditing={() =>
+                                    emailInputRef.current && emailInputRef.current.focus()
+                                    }
+                                    blurOnSubmit={false}
+                                />
+                            </View>
                             <TouchableOpacity
                                 style={styles.buttonStyle}
                                 activeOpacity={0.5}
                                 onPress={handleCreateBet}>
-                                    <Text style={styles.buttonTextStyle}>Make Bid</Text>
+                                    <Text style={styles.buttonTextStyle}>Make Offer</Text>
                             </TouchableOpacity>
                         </View>
                         }

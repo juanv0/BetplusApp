@@ -1,15 +1,19 @@
+// Example of Splash, Login and Sign Up in React Native
+// https://aboutreact.com/react-native-login-and-signup/
 import 'react-native-gesture-handler';
-import * as React from 'react';
-import { Text, View } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
+// Import React and Component
+import React from 'react';
+
+// Import Navigators from React Navigation
+import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 
-import HomeScreen from './Screen/DrawerScreens/HomeScreen';
+// Import Screens
 import SplashScreen from './Screen/SplashScreen';
 import LoginScreen from './Screen/LoginScreen';
 import RegisterScreen from './Screen/RegisterScreen';
+import DrawerNavigationRoutes from './Screen/DrawerNavigationRoutes';
 
 const Stack = createStackNavigator();
 
@@ -40,17 +44,7 @@ const Auth = () => {
   );
 };
 
-function SettingsScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Settings!</Text>
-    </View>
-  );
-}
-
-const Tab = createBottomTabNavigator();
-
-export default function App() {
+const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="SplashScreen">
@@ -69,20 +63,14 @@ export default function App() {
         />
         {/* Navigation Drawer as a landing page */}
         <Stack.Screen
-          name="HomeScreen"
-          component={HomeScreen}
+          name="DrawerNavigationRoutes"
+          component={DrawerNavigationRoutes}
           // Hiding header for Navigation Drawer
           options={{headerShown: false}}
         />
       </Stack.Navigator>
-      <Tab.Navigator>
-        <Tab.Screen name="My Home" component={HomeScreen} />
-        <Tab.Screen name="Search" component={SettingsScreen} />
-        <Tab.Screen name="My Offers" component={SettingsScreen} />
-        <Tab.Screen name="My Proposals" component={SettingsScreen} />
-        <Tab.Screen name="Chat" component={SettingsScreen} />
-        <Tab.Screen name="Settings" component={SettingsScreen} />
-      </Tab.Navigator>
     </NavigationContainer>
   );
-}
+};
+
+export default App;

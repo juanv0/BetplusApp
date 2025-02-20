@@ -47,7 +47,7 @@ const LoginScreen = ({navigation}) => {
     }
     formBody = formBody.join('&');
     console.log(formBody);
-    fetch('http://10.0.2.2:3001/api/security/user/login', {
+    fetch('http://192.168.0.7:3001/api/security/user/login', {
       method: 'POST',
       body: formBody,
       mode: 'cors',
@@ -69,7 +69,7 @@ const LoginScreen = ({navigation}) => {
         if (responseJson.status === 'success') {
           AsyncStorage.setItem('login_data', JSON.stringify(responseJson));
           console.log(navigation.getState());
-          //navigation.replace('DrawerNavigationRoutes');
+          navigation.replace('DrawerNavigationRoutes');
           console.log('Replaced nav drawer');
           console.log(navigation.getState());
         } else {

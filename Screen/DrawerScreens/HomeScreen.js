@@ -7,8 +7,9 @@ const HomeScreen = ({navigation}) => {
     const loadData = async () => {
         try
         {
+            console.log('at home screen');
             console.log('before fetch');
-        const response = await fetch(`http://10.0.2.2:3003/api/user/get_loteries`, {
+        const response = await fetch(`http://10.0.2.2:3003/api/offer/all`, {
         headers: {
             //Header Defination
             'Authorization':
