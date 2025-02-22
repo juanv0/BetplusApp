@@ -27,7 +27,8 @@ const LoginScreen = ({navigation}) => {
 
   const passwordInputRef = createRef();
 
-  const handleSubmitPress = () => {
+  const handleSubmitPress = async () => {
+    const controller = new AbortController();
     setErrortext('');
     if (!userName) {
       alert('Please fill User Name');
@@ -47,42 +48,38 @@ const LoginScreen = ({navigation}) => {
     }
     formBody = formBody.join('&');
     console.log(formBody);
-    fetch('http://192.168.0.7:3001/api/security/user/login', {
-      method: 'POST',
-      body: formBody,
-      mode: 'cors',
-      headers: {
-        //Header Defination
-        'Content-Type':
-        'application/x-www-form-urlencoded;charset=UTF-8',
-      },
-    })
-      .then((response) => 
-        response.json())
-      .then((responseJson) => {
-        //Hide Loader
-        setLoading(false);
-        console.log('got server response');
-        console.log(responseJson);
-        console.log(responseJson.status);
-        // If server response message same as Data Matched
-        if (responseJson.status === 'success') {
-          AsyncStorage.setItem('login_data', JSON.stringify(responseJson));
-          console.log(navigation.getState());
-          navigation.replace('DrawerNavigationRoutes');
-          console.log('Replaced nav drawer');
-          console.log(navigation.getState());
-        } else {
-          setErrortext(responseJson.msg);
-          console.log('Please check your email id or password');
-        }
-      })
-      .catch((error) => {
-        //Hide Loader
-        console.log(error.message);
-        setLoading(false);
-        console.error(error.message);
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    try {
+      const resp = await fetch('http://192.168.1.1:3001/api/security/user/login', {
+        method: 'POST',
+        body: formBody,
+        mode: 'cors',
+        headers: {
+          //Header Defination
+          'Content-Type':
+          'application/x-www-form-urlencoded;charset=UTF-8',
+        },
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
+      const json = await resp.json();
+      setLoading(false);
+      if (json.status === 'success') {
+        await AsyncStorage.setItem('login_data', JSON.stringify(json));
+        navigation.replace('HomeScreen');
+      } else {
+        setErrortext(json.msg);
+        console.log('Please check your email id or password');
+      }
+    }catch(err){
+      if (err.name === "AbortError") {
+        console.error("Timeout!!!!!");
+      }else{
+        console.error(`Error: type: ${err.name}, message: ${err.message}`);
+      }
+      clearTimeout(timeoutId);
+      setLoading(false);
+    }
   };
 
   return (

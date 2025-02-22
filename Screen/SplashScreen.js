@@ -16,10 +16,10 @@ const SplashScreen = ({navigation}) => {
             setAnimating(false);
             AsyncStorage.getItem('login_data').then((value) => 
                 navigation.replace(
-                    value === null ? 'Auth' : 'DrawerNavigationRoutes'
+                    value === null ? 'Auth' : 'MainApp'
                 ),
             );
-        }, 5000);
+        }, 2500);
     }, []);
 
     return (

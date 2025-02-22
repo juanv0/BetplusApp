@@ -1,29 +1,48 @@
 import React, {useState, useEffect} from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ActivityIndicator, Text, SafeAreaView, View, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 
 const HomeScreen = ({navigation}) => {
+    
     const [data, setData] = useState([]);
+    const [emptyData, setEmptyData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const loadData = async () => {
+        const controller = new AbortController();
         try
         {
             console.log('at home screen');
-            console.log('before fetch');
-        const response = await fetch(`http://10.0.2.2:3003/api/offer/all`, {
-        headers: {
-            //Header Defination
-            'Authorization':
-            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25hbWUiOiJqdWFuIiwicm9sZSI6InVzZXIiLCJpYXQiOjE2NDgwMDUwNzl9.3qGr3NiQa1VSdpTSQlbUJHh6hAGAAvmbnIBogEIWLwQ',
-        }
+            
+            const raw_data = await AsyncStorage.getItem('login_data');
+            const authData = JSON.parse(raw_data);
+            let token = authData.token;
+            console.log(token);
+            console.log('after token');
+            const timeoutId = setTimeout(() => controller.abort(), 20000);
+            const response = await fetch(`http://192.168.1.1:3007/api/offer/all`, {
+            headers: {
+                //Header Defination
+                'Authorization':
+                'Bearer ' + token,
+            },
+            signal: controller.signal
         
         });
-        const json = await response.json();
-        console.log(json);
-        setData(json);
+        clearTimeout(timeoutId);
+        if (response.status === 200){
+            const json = await response.json();
+            console.log(json);
+            setData(json);
+            setEmptyData(false);
+        }else {
+            console.log("empty Set");
+        }
+        
         setIsLoading(false);
     }
         catch(error)  {
             //Hide Loader
+            clearTimeout(timeoutId);
             console.log(error.message);
             console.error(error.message);
         };
@@ -33,6 +52,26 @@ const HomeScreen = ({navigation}) => {
         //console.log(data);
         console.log('after loadData');
     }, []);
+    const DisplayList = () => {
+        if (emptyData){
+            return(
+                <View>
+                    <Text>Oooops 0 Entries found</Text>
+                </View>
+            )
+        }else{
+            data.map((item, index) => (
+                            
+                <TouchableOpacity key = {item._id}  onPress={() => navigation.navigate("CreateBet", { id: item._id })}>
+                    <View  key = {item._id} style = {styles.item}>
+                    <Text>{item.owner}</Text>
+                    <Text>{item.plays_on}</Text>
+                </View>
+
+                </TouchableOpacity>
+            ))
+        }
+    }
     return (
         <SafeAreaView style={{flex: 1}}>
             <View style={{flex: 1, padding: 16}}>
@@ -48,16 +87,7 @@ const HomeScreen = ({navigation}) => {
                         <View>
                             <ActivityIndicator size="small" color="#0000ff" />
                         </View> :
-                        data.map((item, index) => (
-                            
-                            <TouchableOpacity key = {item._id}  onPress={() => navigation.navigate("CreateBet", { id: item._id })}>
-                                <View  key = {item._id} style = {styles.item}>
-                                <Text>{item.owner}</Text>
-                                <Text>{item.plays_on}</Text>
-                            </View>
-
-                            </TouchableOpacity>
-                        ))
+                        <DisplayList />
                     }
                 </ScrollView>
 
